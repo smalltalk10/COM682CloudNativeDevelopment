@@ -7,6 +7,7 @@ const endpoints = {
   DIMURI0: "https://prod-26.uksouth.logic.azure.com/workflows/0199066f66d043c883292ae972e0b97d/triggers/manual/paths/invoke/rest/v1/media/",
   DIMURI1: "?api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=W36m41es2d6x-9EZf9PTa3HABaQj7aMxM0b3QtPP1hE",
   BLOB_ACCOUNT: "https://assignment2storageacc.blob.core.windows.net",
+
 };
 // Event handlers for button clicks
 $(document).ready(function() {
@@ -64,6 +65,7 @@ async function getMedia() {
   $.getJSON(
     {
       url:  endpoints.RAM, 
+      headers: {'X-ACCESS-TOKEN': "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0aW1lIjoiMjAyMy0xMS0yOVQyMToyMzo1NC4wMDBaIiwidXNlcklEIjoxLCJ1c2VybmFtZSI6InNtYWxsdGFsazEwIiwicm9sZSI6IkxvZ2dlZC1pbiBVc2VyIiwiaWF0IjoxNzAxMjkxMjM0fQ.uWMQZjF_DzNAJqHqpqDpjqyZq1xazXfE4uFPGdBNG1A"}
     }, function(data) {
     var table = document.getElementById('mediaList');
     table.className = 'table';
