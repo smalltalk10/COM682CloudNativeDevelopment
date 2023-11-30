@@ -143,13 +143,12 @@ function createButton(text, className, clickHandler) {
 }
 
 function openEditForm(id) {
+  $('#updateMediaModal').modal('show');
   $("#submitEditButton").off("click").on("click", function() {
     const appendData = {"fileName": $('#appendFileName').val(), "description": $('#appendDescription').val()};
     submitEditMedia(id, appendData);
     $('#updateMediaModal').modal('hide');
   });
-
-  $('#updateMediaModal').modal('show');
 }
 
 $(document).ready(function() {
