@@ -18,6 +18,12 @@ $(document).ready(function() {
 $("#subNewForm").click(function() {
     submitNewAsset();
   });
+
+  $("#logoutBtn").click(function () {
+    // Perform logout actions as needed
+    // For example, you can redirect the user back to the login page
+    window.location.href = "login.html"
+  })
 });
 
 // Function to sign in as User
