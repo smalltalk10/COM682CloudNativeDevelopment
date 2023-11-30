@@ -16,29 +16,48 @@
             <div class="card-body p-4 p-sm-5">
               <h5 class="card-title text-center mb-5 fw-light fs-5">Sign In</h5>
                 <div class="form-floating mb-3">
-                  <input type="username" class="form-control" id="floatingUsername" placeholder="username">
+                  <input type="username" class="form-control" id="floatingUsername" placeholder="username" required>
                   <label for="floatingInput">Username</label>
                 </div>
                 <div class="form-floating mb-3">
-                  <input type="password" class="form-control" id="floatingPassword" placeholder="password">
+                  <input type="password" class="form-control" id="floatingPassword" placeholder="password" required>
                   <label for="floatingPassword">Password</label>
                 </div>
-  
-                <div class="form-check mb-3">
-                  <input class="form-check-input" type="checkbox" value="" id="rememberPasswordCheck">
-                  <label class="form-check-label" for="rememberPasswordCheck">
-                    Remember password
-                  </label>
-                </div>
                 <div class="d-grid">
-                  <button class="btn btn-primary btn-login text-uppercase fw-bold" id="loginBtn">Sign in</button>
+                  <button class="btn btn-primary btn-login text-uppercase fw-bold" id="userLoginBtn">Sign in</button>
                 </div>
                 <hr class="my-4">
                 <div class="d-grid mb-2">
-                  <button class="btn btn-success btn-login text-uppercase fw-bold" id="subGuest" type="submit">
-                    <i class="fab fa-google me-2"></i> Sign in as Guest
+                  <button class="btn btn-success btn-login text-uppercase fw-bold" id="guestLoginBtn"> Sign in as Guest
                   </button>
               </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+       <!-- Modal -->
+       <div class="modal fade" id="registerModal" tabindex="-1" role="dialog" aria-labelledby="registerLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="registerLabel">Edit Media</h5>
+            </div>
+            <div class="modal-body">
+              <form>
+                <div class="mb-3">
+                  <label for="appendFileName" class="form-label">Enter New File Name</label>
+                  <input type="text" class="form-control" id="appendFileName">
+                </div>
+                <div class="mb-3">
+                  <label for="appendDescripton" class="form-label">Enter New Description</label>
+                  <input type="text" class="form-control" id="appendDescription">
+                </div>
+            </form>
+            </div>
+            <div class="modal-footer">
+              <button id='closeModal' type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+              <button type="button" id="submitEditButton" class="btn btn-primary">Save changes</button>
             </div>
           </div>
         </div>

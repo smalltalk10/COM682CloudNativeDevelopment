@@ -7,8 +7,18 @@ const endpoints = {
   DIMURI0: "https://prod-26.uksouth.logic.azure.com/workflows/0199066f66d043c883292ae972e0b97d/triggers/manual/paths/invoke/rest/v1/media/",
   DIMURI1: "?api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=W36m41es2d6x-9EZf9PTa3HABaQj7aMxM0b3QtPP1hE",
   BLOB_ACCOUNT: "https://assignment2storageacc.blob.core.windows.net",
-
 };
+
+jwt = localStorage.getItem('token');
+
+if (jwt == '') {
+  window.location.href = "login.html"
+} else {
+  const jwtValues = jwt.split(".");
+  const username = JSON.parse(atob(jwtValues[1]))['username'];
+  const role = JSON.parse(atob(jwtValues[1]))['role'];  
+}
+
 // Event handlers for button clicks
 $(document).ready(function() {
   $("#retMedia").click(function() {
@@ -22,38 +32,22 @@ $("#subNewForm").click(function() {
   $("#logoutBtn").click(function () {
     // Perform logout actions as needed
     // For example, you can redirect the user back to the login page
+    localStorage.setItem('token', '');
     window.location.href = "login.html"
   })
 });
-
-// Function to sign in as User
-function submitUserLogin() {
-  var submitData = new FormData();
-  submitData.append('username', $('#floatingUsername').val());
-  submitData.append('password', $('#floatingPassword').val());
-
-  $.ajax({
-    url: endpoints.USERLOGIN,
-    data: submitData,
-    cache: false,
-    enctype: 'multipart/form-data',
-    contentType: false,
-    processData: false,
-    type: 'POST',
-  }).done();
-}
 
 // Function to submit a new asset to the REST endpoint
 function submitNewAsset() {
   var submitData = new FormData();
   submitData.append('fileName', $('#fileName').val());
-  submitData.append('userID', $('#userID').val());
-  submitData.append('userName', $('#userName').val());
+  submitData.append('description', $('#description').val());
   submitData.append('file', $("#UpFile")[0].files[0]);
   submitData.append('fileType', $("#UpFile")[0].files[0].type);
 
   $.ajax({
     url: endpoints.CIM,
+    headers: {'X-ACCESS-TOKEN': jwt},
     data: submitData,
     cache: false,
     enctype: 'multipart/form-data',
@@ -71,13 +65,13 @@ async function getMedia() {
   $.getJSON(
     {
       url:  endpoints.RAM, 
-      headers: {'X-ACCESS-TOKEN': "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0aW1lIjoiMjAyMy0xMS0yOVQyMToyMzo1NC4wMDBaIiwidXNlcklEIjoxLCJ1c2VybmFtZSI6InNtYWxsdGFsazEwIiwicm9sZSI6IkxvZ2dlZC1pbiBVc2VyIiwiaWF0IjoxNzAxMjkxMjM0fQ.uWMQZjF_DzNAJqHqpqDpjqyZq1xazXfE4uFPGdBNG1A"}
+      headers: {'X-ACCESS-TOKEN': jwt}
     }, function(data) {
     var table = document.getElementById('mediaList');
     table.className = 'table';
 
     var row = table.insertRow();
-    var labels = ["Media", "Type", "File Name", "User Name", "User Number"];
+    var labels = ["Media", "Type", "File Name", "Description", "User Name"];
 
     for (var i = 0; i < labels.length; i++) {
       var cell = row.insertCell(i);
@@ -88,7 +82,7 @@ async function getMedia() {
       var row = table.insertRow();
 
       var fileType = val["fileType"];
-      var split = fileType.toLowerCase().split('/');
+      var split = fileType.split('/');
       var extension = split[split.length - 1];
 
       var cell1 = row.insertCell(0);
@@ -119,8 +113,8 @@ async function getMedia() {
       }
 
       cell3.textContent = val["fileName"];
-      cell4.textContent = val["userName"];
-      cell5.textContent = val["userID"];
+      cell4.textContent = val["description"];
+      cell5.textContent = val["userName"];
 
       cell6.appendChild(createEditButton(val["id"]));
       cell7.appendChild(createDeleteButton(val["id"]));
@@ -150,17 +144,18 @@ function createButton(text, className, clickHandler) {
 
 function openEditForm(id) {
   $("#submitEditButton").off("click").on("click", function() {
-    const appendData = {"fileName": $('#appendFileName').val()};
+    const appendData = {"fileName": $('#appendFileName').val(), "description": $('#appendDescription').val()};
     submitEditMedia(id, appendData);
-    $('#exampleModal').modal('hide');
+    $('#updateMediaModal').modal('hide');
   });
 
-  $('#exampleModal').modal('show');
+  $('#updateMediaModal').modal('show');
 }
 
 $(document).ready(function() {
-  $('#exampleModal').on('hidden.bs.modal', function() {
+  $('#updateMediaModal').on('hidden.bs.modal', function() {
     $('#appendFileName').val('');
+    $('#appendDescription').val('');
   });
 });
 
@@ -168,6 +163,7 @@ function submitEditMedia(id, appendData) {
   $.ajax({
     type: "PUT",
     url: `${endpoints.UIMURI0}${id}${endpoints.UIMURI1}`,
+    headers: {'X-ACCESS-TOKEN': jwt},
     data: appendData,
   }).done(getMedia);
 }
@@ -176,5 +172,6 @@ function deleteMedia(id) {
   $.ajax({
     type: "DELETE",
     url: `${endpoints.DIMURI0}${id}${endpoints.DIMURI1}`,
+    headers: {'X-ACCESS-TOKEN': jwt}
   }).done(getMedia);
 }
