@@ -43,15 +43,9 @@
                   <label for="fileName" class="form-label">File Name</label>
                   <input type="text" class="form-control" id="fileName">
                 </div>
-
                 <div class="mb-3">
-                  <label for="userID" class="form-label">User Id</label>
-                  <input type="string" class="form-control" id="userID">
-                </div>
-
-                <div class="mb-3">
-                  <label for="userName" class="form-label">User Name</label>
-                  <input type="text" class="form-control" id="userName">
+                  <label for="description" class="form-label">Description</label>
+                  <input type="text" class="form-control" id="description">
                 </div>
 
                 <div class="mb-3">
@@ -77,27 +71,25 @@
               </div>
               <table id="mediaList">
               </table>
-              <div style="padding:5px;">
-                <!-- Logout button -->
-                <button id="logoutBtn" type="button" class="btn btn-danger">Logout</button>
-              </div>
             </div>
-            
-            <div class="col-2"  ></div>
         </div>
 
       <!-- Modal -->
-      <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal fade" id="updateMediaModal" tabindex="-1" role="dialog" aria-labelledby="updateMediaLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
           <div class="modal-content">
             <div class="modal-header">
-              <h5 class="modal-title" id="exampleModalLabel">Edit Media</h5>
+              <h5 class="modal-title" id="updateMediaLabel">Edit Media</h5>
             </div>
             <div class="modal-body">
               <form>
                 <div class="mb-3">
                   <label for="appendFileName" class="form-label">Enter New File Name</label>
                   <input type="text" class="form-control" id="appendFileName">
+                </div>
+                <div class="mb-3">
+                  <label for="appendDescripton" class="form-label">Enter New Description</label>
+                  <input type="text" class="form-control" id="appendDescription">
                 </div>
             </form>
             </div>
