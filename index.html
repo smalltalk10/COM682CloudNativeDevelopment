@@ -23,8 +23,9 @@
               <h3>Media Share</h3>
             </div>
 
-            <div class="col-2 text-end">
+            <div class="col-2">
               <!-- Logout button at the top right corner -->
+              <button id="editProfileBtn" type="button" class="btn btn-info">View Profile</button>
               <button id="logoutBtn" type="button" class="btn btn-danger">Logout</button>
             </div>
 
@@ -96,6 +97,55 @@
             <div class="modal-footer">
               <button id='closeModal' type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
               <button type="button" id="submitEditButton" class="btn btn-primary">Save changes</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal -->
+      <div class="modal fade" id="editProfileModal" tabindex="-1" role="dialog" aria-labelledby="editProfileLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="registerLabel">View/Edit Profile</h5>
+            </div>
+            <div class="modal-body">
+              <div class="mb-3">
+                <label for="profileUsername" class="form-label" style="font-weight: bold;">Username: </label>
+                <label id="profileUsername"></label>
+              </div>
+              <div class="mb-3">
+                <label for="profileEmail" class="form-label" style="font-weight: bold">Email: </label>
+                <label id="profileEmail"></label>
+              </div>
+              <div class="mb-3">
+                <label for="profileRole" class="form-label" style="font-weight: bold">Role: </label>
+                <label id="profileRole"></label>
+              </div>
+              <div class="mb-3">
+                <label for="profileCreateTime" class="form-label" style="font-weight: bold">Account Created: </label>
+                <label id="profileCreateTime"></label>
+              </div>
+              <form>
+                <div class="mb-3">
+                  <label for="aregisterEmail" class="form-label">Email</label>
+                  <input type="text" class="form-control" id="registerEmail">
+                </div>
+                <div class="mb-3">
+                  <label for="registerPassword" class="form-label">Password</label>
+                  <input type="password" class="form-control" id="registerPassword">
+                </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <div class="d-grid mb-2">
+                <button class="btn btn-primary btn-login text-uppercase fw-bold" id="subEditProfileBtn">Edit
+                </button>
+              </div>
+              <div class="d-grid mb-2">
+                <button class="btn btn-primary btn-danger text-uppercase fw-bold" id="subDeleteProfileBtn">Delete
+                </button>
+              </div>
             </div>
           </div>
         </div>

@@ -80,7 +80,7 @@ $(document).ready(function () {
 })
   
 $(document).ready(function() {
-    $('#openRegisterModalBtn').on('hidden.bs.modal', function() {
+    $('#registerModal').on('hidden.bs.modal', function() {
         $('#registerUsername').val('');
         $('#registerEmail').val('');
         $('#registerPassword').val('');
