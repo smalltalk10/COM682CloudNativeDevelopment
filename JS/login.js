@@ -5,92 +5,78 @@ const endpoints = {
 };
 
 $(document).ready(function () {
-    $("#userLoginBtn").click(function () {
+    const userLoginBtn = $("#userLoginBtn");
+    const guestLoginBtn = $("#guestLoginBtn");
+    const openRegisterModalBtn = $("#openRegisterModalBtn");
+    const registerModal = $('#registerModal');
+    const registerBtn = $("#registerBtn");
+    const registerUsername = $('#registerUsername');
+    const registerEmail = $('#registerEmail');
+    const registerPassword = $('#registerPassword');
+
+    userLoginBtn.click(function () {
         localStorage.setItem('token', '');
-        var submitData = new FormData();
+        const submitData = new FormData();
         submitData.append('username', $('#floatingUsername').val());
         submitData.append('password', $('#floatingPassword').val());
-      
+
         $.ajax({
-          url: endpoints.USERLOGIN,
-          data: submitData,
-          cache: false,
-          enctype: 'multipart/form-data',
-          contentType: false,
-          processData: false,
-          type: 'POST',
-        }).done(function(data) {
-            const jwt = JSON.parse(data).token
-            localStorage.setItem('token', jwt);
-
-            const jwtValues = jwt.split(".");
-            const role = JSON.parse(atob(jwtValues[1]))['role'];
-
-            // Check if username and password match the dummy data
-            if (jwt !== undefined && role == "Logged-in User") {
-            // If successful, redirect to the main page
-            window.location.href = "index.html"
-            } else {
-            // If login fails, show an alert (you can customize this part)
-            alert("Invalid username or password. Please try again.")
+            url: endpoints.USERLOGIN,
+            data: submitData,
+            cache: false,
+            contentType: false,
+            processData: false,
+            type: 'POST',
+            success: function (data) {
+                handleLoginResponse(data);
+            },
+            error: function (error) {
+                alert(error?.responseJSON?.message);
             }
-        });
-    })
-})
+        });        
+    });
 
-$(document).ready(function () {
-    $("#guestLoginBtn").click(function () {  
-        $.getJSON(
-            {
-              url:  endpoints.GUESTLOGIN, 
-            }, function(data) {
+    guestLoginBtn.click(function () {
+        $.getJSON({
+            url: endpoints.GUESTLOGIN,
+        }).done(handleLoginResponse);
+    });
 
-            const jwt = data?.token
-            localStorage.setItem('token', jwt);
-
-            const jwtValues = jwt.split(".");
-            const role = JSON.parse(atob(jwtValues[1]))['role'];
-
-            // Check if username and password match the dummy data
-            if (jwt !== '' && role == "Guest User") {
-            // If successful, redirect to the main page
-            window.location.href = "index.html"
-            } else {
-            // If login fails, show an alert (you can customize this part)
-            conso
-            alert("Could not contact server. Please try again.")
-            }
-        });
-    })
-})
-
-$(document).ready(function () {
-    $("#openRegisterModalBtn").click(function() {
-        $('#registerModal').modal('show');
-        $("#registerBtn").off("click").on("click", function() {
-            const data = {
-                "username": $('#registerUsername').val(),
-                "email": $('#registerEmail').val(),
-                "password": $('#registerPassword').val()
+    openRegisterModalBtn.click(function() {
+        registerModal.modal('show');
+        registerBtn.off("click").on("click", function() {
+            const registerData = {
+                "username": registerUsername.val(),
+                "email": registerEmail.val(),
+                "password": registerPassword.val()
             };
-            submitRegisterUser(data);
-            $('#registerModal').modal('hide');
-          });
+            submitRegisterUser(registerData);
+            registerModal.modal('hide');
+        });
     });
-})
-  
-$(document).ready(function() {
-    $('#openRegisterModalBtn').on('hidden.bs.modal', function() {
-        $('#registerUsername').val('');
-        $('#registerEmail').val('');
-        $('#registerPassword').val('');
-    });
-});
 
-function submitRegisterUser(data) {
-    $.ajax({
-      type: "POST",
-      url: endpoints.USERREGISTER,
-      data,
-    }).done();
-  }
+    registerModal.on('hidden.bs.modal', function() {
+        registerUsername.val('');
+        registerEmail.val('');
+        registerPassword.val('');
+    });
+
+    function handleLoginResponse(data) {
+        const jwt = data?.token;
+        localStorage.setItem('token', jwt);
+
+        if (jwt) {
+            window.location.href = "index.html";
+        } else {
+            alert("Invalid username or password. Please try again.");
+        }
+    }
+
+    function submitRegisterUser(data) {
+        $.ajax({
+            type: "POST",
+            url: endpoints.USERREGISTER,
+            data,
+        }).done();
+    }
+});
