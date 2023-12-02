@@ -229,9 +229,8 @@ async function submitDeleteProfile(data) {
     url: `${endpoints.DIU0}${userID}${endpoints.DIU1}`,
     headers: { 'X-ACCESS-TOKEN': jwt },
     data,
-  })
-    .done(function (response) {
+  }).done(function() {
       localStorage.setItem('token', '');
       window.location.href = 'login.html';
-    });
+   });
 }
