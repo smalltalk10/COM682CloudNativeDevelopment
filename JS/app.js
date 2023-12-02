@@ -29,8 +29,10 @@ const role = JSON.parse(atob(jwtValues[1])).role;
 
 // Event handlers for button clicks
 $(document).ready(function () {
-  $("#retMedia").click(getMedia);
-  $("#subNewForm").click(submitNewAsset);
+  $("#retMedia").on("click", function() {
+    getMedia()
+  });
+  $("#createMediaBtn").click(openCreatePostModal);
   $("#editProfileBtn").click(openEditProfileModal);
   $("#logoutBtn").click(function () {
     localStorage.setItem('token', '');
@@ -38,91 +40,152 @@ $(document).ready(function () {
   });
 });
 
-// Function to submit a new asset to the REST endpoint
-function submitNewAsset() {
-  const submitData = new FormData();
-  submitData.append('fileName', $('#fileName').val());
-  submitData.append('description', $('#description').val());
-  submitData.append('file', $("#UpFile")[0].files[0]);
-  submitData.append('fileType', $("#UpFile")[0].files[0].type);
+var userWelcomeElement = document.getElementById("userWelcome");
 
-  $.ajax({
-    url: endpoints.CIM,
-    headers: { 'X-ACCESS-TOKEN': jwt },
-    data: submitData,
-    cache: false,
-    enctype: 'multipart/form-data',
-    contentType: false,
-    processData: false,
-    type: 'POST',
-  }).done(getMedia);
+if (userWelcomeElement) {
+  user = username ? username : role;
+  userWelcomeElement.innerHTML = "Welcome " + user;
+} else {
+  console.error("Element with id 'userWelcome' not found");
 }
 
-async function getMedia() {
-  $('table').empty();
-  $.getJSON(
-    {
-      url:  endpoints.RAM, 
-      headers: {'X-ACCESS-TOKEN': jwt}
-    }, function(data) {
-    var table = document.getElementById('mediaList');
-    table.className = 'table';
+function searchMedia() {
+    // Get the value from the search input
+    var query = document.getElementById('searchInput').value;
 
-    var row = table.insertRow();
-    var labels = ["Media", "Type", "File Name", "Description", "User Name"];
-
-    for (var i = 0; i < labels.length; i++) {
-      var cell = row.insertCell(i);
-      cell.textContent = labels[i];
+    // Check if the query is not empty
+    if (query.trim() !== "") {
+      getMedia(query)
+    } else {
+        alert('Please enter a search query.');
     }
+}
 
-    $.each(data, function(key, val) {
-      var row = table.insertRow();
+function getMyMedia() {
+  getMedia(username)
+}
 
+async function getMedia(query) {
+  $('#mediaPost').empty();
+  $('#mediaContainer').empty(); // Clear previous media elements
+  $.getJSON({
+    url: endpoints.RAM,
+    headers: { 'X-ACCESS-TOKEN': jwt }
+  }, function (data) {
+    // Iterate through each data item
+    $.each(data, function (key, val) {
+      if (query && query !== val['userName']) {
+        return;
+      }
+      // Create media element
+      let media;
       var fileType = val["fileType"];
       var split = fileType.split('/');
       var extension = split[split.length - 1];
 
+      // Create a new div for each data item
+      var mediaDiv = document.createElement('div');
+      mediaDiv.className = 'content media-container'; // Added the 'media-container' class
+
+      // Append media element inside the new div
+      mediaDiv.innerHTML = media;
+
+      // Apply CSS style to center the media element
+      mediaDiv.style.textAlign = 'center';
+
+      // Create table for each data item
+      var table = document.createElement('table');
+      table.className = 'table';
+
+      // Create the table header
+      var headerRow = table.insertRow();
+      var headerLabels = ["File Name", "Description", "Type", "Username", "Edit", "Delete"];
+
+      for (var i = 0; i < headerLabels.length; i++) {
+        var headerCell = headerRow.insertCell(i);
+        headerCell.textContent = headerLabels[i];
+      }
+
+      // Create table row
+      var row = table.insertRow();
       var cell1 = row.insertCell(0);
       var cell2 = row.insertCell(1);
       var cell3 = row.insertCell(2);
       var cell4 = row.insertCell(3);
       var cell5 = row.insertCell(4);
       var cell6 = row.insertCell(5);
-      var cell7 = row.insertCell(6);
 
-      // Populate cells with data
+      
       switch (extension) {
         case 'video': case 'mp4': case 'mov': case 'wmv': case 'avi': case 'flv': case 'mkv':
-          cell1.innerHTML = `<video controls width="350"><source src="${endpoints.BLOB_ACCOUNT}${val["filePath"]}" type="video/mp4"></video>`;
-          cell2.textContent = "Video";
+          media = `<video controls width="750"><source src="${endpoints.BLOB_ACCOUNT}${val["filePath"]}" type="video/mp4"></video>`;
+          cell3.append('Video')
           break;
         case 'image': case 'jpeg': case 'pdf': case 'png': case 'raw': case 'bmp': case 'gif': case 'webp':
-          cell1.innerHTML = `<img src="${endpoints.BLOB_ACCOUNT}${val["filePath"]}" width="350" alt="Image">`;
-          cell2.textContent = "Image";
+          media = `<img src="${endpoints.BLOB_ACCOUNT}${val["filePath"]}" width="400" alt="Image">`;
+          cell3.append('Image')
           break;
         case 'audio': case 'mp3': case 'mpeg': case 'wav': case 'acc': case 'wma':
-          cell1.innerHTML = `<audio controls><source src="${endpoints.BLOB_ACCOUNT}${val["filePath"]}" type="audio/mp3"></audio>`;
-          cell2.textContent = "Audio";
+          media = `<audio controls><source src="${endpoints.BLOB_ACCOUNT}${val["filePath"]}" type="audio/mp3"></audio>`;
+          cell3.append('Audio')
           break;
         default:
-          cell1.textContent = 'Unsupported file type';
+          media = '<p>Unsupported file type</p>';
           break;
       }
 
-      cell3.textContent = val["fileName"];
-      cell4.textContent = val["description"];
-      cell5.textContent = val["userName"];
+      // Populate cells with data
+      cell1.textContent = val["fileName"];
+      cell2.textContent = val["description"];
+      cell4.textContent = val["userName"];
 
-      cell6.appendChild(createEditButton(val["id"]));
-      cell7.appendChild(createDeleteButton(val["id"]));
+      cell5.appendChild(createEditMediaButton(val["id"]));
+      cell6.appendChild(createDeleteButton(val["id"]));
+
+      // Append media element inside the new div
+      mediaDiv.innerHTML = media;
+
+      // Append the table to the new div
+      mediaDiv.append(table);
+
+      // Append the new div to the desired element
+      $('#mediaPost').append(mediaDiv);
     });
   });
 }
 
-function createEditButton(id) {
+async function openCreatePostModal() {
+  $('#createMediaModal').modal('show');
+  $("#submitCreateBtn").off("click").on("click", function() {
+    submitData = new FormData()
+
+    //Get form variables and append them to the form data object
+    submitData.append("fileName", $("#fileName").val())
+    submitData.append("userID", $("#userID").val())
+    submitData.append("description", $("#description").val())
+    submitData.append("file", $("#UpFile")[0].files[0])
+    submitData.append("fileType", $("#UpFile")[0].files[0].type)
+    submitCreateMedia(submitData);
+    $('#createMediaModal').modal('hide');
+  });
+}
+
+function submitCreateMedia(submitData) {
+  $.ajax({
+    url: `${endpoints.CIM}`,
+    headers: { 'X-ACCESS-TOKEN': jwt },
+    data: submitData,
+    cache: false,
+    enctype: "multipart/form-data",
+    contentType: false,
+    processData: false,
+    type: "POST",
+  }).done(getMedia);
+}
+
+function createEditMediaButton(id) {
   return createButton('Edit', 'btn btn-info', function () {
-    openEditForm(id);
+    openEditMediaForm(id);
   });
 }
 
@@ -141,7 +204,7 @@ function createButton(text, className, clickHandler) {
   return button;
 }
 
-function openEditForm(id) {
+function openEditMediaForm(id) {
   $('#updateMediaModal').modal('show');
   $("#submitEditButton").off("click").on("click", function() {
     const appendData = {"fileName": $('#appendFileName').val(), "description": $('#appendDescription').val()};
@@ -152,6 +215,11 @@ function openEditForm(id) {
 
 
 $(document).ready(function () {
+  $('#createMediaModal').on('hidden.bs.modal', function () {
+    $('#fileName').val('');
+    $('#description').val('');
+    $('#file').val('');
+  });
   $('#updateMediaModal').on('hidden.bs.modal', function () {
     $('#appendFileName').val('');
     $('#appendDescription').val('');
@@ -177,34 +245,48 @@ function deleteMedia(id) {
     type: 'DELETE',
     url: `${endpoints.DIM0}${id}${endpoints.DIM1}`,
     headers: { 'X-ACCESS-TOKEN': jwt },
-  }).done(getMedia);
+    success: function() {
+      getMedia();
+    },
+    error: function(jqXHR) {
+      alert('Error deleting media: ' + jqXHR.responseJSON.message);
+    }
+  });
 }
 
 async function openEditProfileModal() {
-  $.getJSON(
-    {
+  try {
+    const data = await $.ajax({
       url: `${endpoints.RIU0}${userID}${endpoints.RIU1}`,
-      headers: {'X-ACCESS-TOKEN': jwt}
-    }, function(data) {
-      $('#editProfileModal').modal('show');
-      document.getElementById("profileUsername").innerHTML = data["username"];
-      document.getElementById("profileEmail").innerHTML = data["email"];
-      document.getElementById("profileRole").innerHTML = data["role"];
-      document.getElementById("profileCreateTime").innerHTML = new Date(data["createTime"]).toLocaleDateString();
+      headers: {'X-ACCESS-TOKEN': jwt},
+      method: 'GET',
+      dataType: 'json',
+    });
 
-      $("#subEditProfileBtn").off("click").on("click", function() {
-        const data = {
-          "email": $('#registerEmail').val(),
-          "password": $('#registerPassword').val()
-        };
-        submitEditProfile(data);
-        $('#editProfileModal').modal('hide');
-      });
-      $("#subDeleteProfileBtn").off("click").on("click", function() {
-        submitDeleteProfile();
-        $('#editProfileModal').modal('hide');
-      });
-    })
+    $('#editProfileModal').modal('show');
+    document.getElementById("profileUsername").innerHTML = data["username"];
+    document.getElementById("profileEmail").innerHTML = data["email"];
+    document.getElementById("profileRole").innerHTML = data["role"];
+    document.getElementById("profileCreateTime").innerHTML = new Date(data["createTime"]).toLocaleDateString();
+
+    $("#subEditProfileBtn").off("click").on("click", function() {
+      const updateData = {
+        "email": $('#registerEmail').val(),
+        "password": $('#registerPassword').val()
+      };
+      submitEditProfile(updateData)
+        .then(() => $('#editProfileModal').modal('hide'))
+        .catch(error => console.error('Error submitting edit profile:', error));
+    });
+
+    $("#subDeleteProfileBtn").off("click").on("click", function() {
+      submitDeleteProfile()
+        .then(() => $('#editProfileModal').modal('hide'))
+        .catch(error => console.error('Error submitting delete profile:', error));
+    });
+  } catch (error) {
+    alert('Error fetching profile data: ' + error.responseJSON.message);
+  }
 }
 
 $(document).ready(function() {
