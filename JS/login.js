@@ -50,9 +50,8 @@ $(document).ready(function () {
                 "email": registerEmail.val(),
                 "password": registerPassword.val()
             };
-            submitRegisterUser(registerData, function() {
-                registerModal.modal('hide');
-            });
+            submitRegisterUser(registerData);
+            registerModal.modal('hide');
         });
     });
 
@@ -73,20 +72,11 @@ $(document).ready(function () {
         }
     }
 
-    function submitRegisterUser(data, successCallback) {
+    function submitRegisterUser(data) {
         $.ajax({
             type: "POST",
             url: endpoints.USERREGISTER,
             data,
-            success: function(response) {
-                if (successCallback) {
-                    successCallback(response);
-                    alert("User Registered Successfully")
-                }
-            },
-            error: function(error) {
-                alert(error?.responseJSON?.message);
-            }
-        });
+        }).done();
     }
 });

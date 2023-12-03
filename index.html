@@ -1,73 +1,44 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
+<!doctype html>
+<html lang="en" ng-app="Dashboard">
+  <head>
     <meta charset="UTF-8">
-    <meta name="author" content="Niall Morrissey">
-    <meta name="keywords" content="Aviation, Aircraft, Flying, Pilot, History, Enthusiast, Learning">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Media Sharing Platform</title>
-    <link rel="stylesheet" href="CSS/bootstrap.min.css">
-    <link rel="stylesheet" href="./CSS/StyleSheet.css">
-    <link rel="shortcut icon" type="image/ico" href="./Images/favicon.png"/>
-    <script defer src="JS/jquery-3.6.0.min.js"></script>
-    <script defer src="JS/bootstrap.bundle.min.js"></script>
-    <script defer src="JS/app.js"></script>
-</head>
+
+    <title>Asset Track</title>
+
+      <link rel="stylesheet" type="text/css" href="CSS/bootstrap.min.css">
+      <script type="text/javascript" src="JS/bootstrap.js"></script>
+      <script type="text/javascript" src="JS/bootstrap.bundle.min.js"></script>
+      <script type="text/javascript" src="JS/jquery-3.6.0.min.js"></script>
+      <script type="text/javascript" src="JS/app.js"></script>
+  </head>
   
   <body>
-    <header> <!-- Header logo image at top of each page-->  
-      <img id="headerlogo" src="./Images/headerlogo.PNG" alt="Soaring Aviation Website Header" >   
-    </header>
-    <div id="container"> <!--Start of container div-->
-      <div id="maincontent">
-        <ul> <!--list of links in navigation bar -->
-          <li><a href="index.html" class="activepage">All Posts</a></li>
-          <li><a href="yourmedia.html">Your Posts</a></li>
+    <div  class="container">
 
-          <li class="socialicons"><button id="logoutBtn" type="button" class="btn btn-danger">Logout</button></li>
-          <li class="socialicons"><button id="editProfileBtn" type="button" class="btn btn-info">Edit Profile</button></li>
-        </ul>
-      </div>
-      <div id="maincontent">
-        <div class="content">
-            <!-- Header -->
-            <div class="row align-items-center">
-                <div class="col-2"></div>
-                <div class="col-8 text-center">
-                    <h1 id="userWelcome">Welcome</h1>
-                    <p>Welcome to Soaring Aviation Media share, a connected website to share Images, Videos, and Audio with other aviation enthusiasts! 
-                        Click "View Media" to check out other users' posts.</p>
-                </div>
-                <div class="col-2"></div>
+        <!--Header-->
+        <div class="row align-items-start">
+            <div class="col-2"  ></div>
+
+            <div class="col-8" style="text-align: center;">
+              <h3>Media Share</h3>
             </div>
-    
-            <!-- View Asset Area -->
-            <div class="row align-items-center">
-                <div class="col-8"></div>
-                <div class="col-8" style="text-align: left;">
-                    <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                            <button id="createMediaBtn" class="btn btn-info" type="button" style="margin-left: 10px;">Create Post</button>
-                            <button id="retMedia" class="btn btn-primary" type="button" style="margin-right: 25px;">View Posts</button>
-                        </div>
-                        <input type="text" id="searchInput" class="form-control" placeholder="Username..." style="margin-left: 10px;">
-                        <div class="input-group-append">
-                            <button class="btn btn-secondary" type="button" style="margin-left: 10px;" onclick="searchMedia()">Search User</button>
-                        </div>
-                    </div>
-                </div>
+
+            <div class="col-2">
+              <!-- Logout button at the top right corner -->
+              <button id="editProfileBtn" type="button" class="btn btn-info">View Profile</button>
+              <button id="logoutBtn" type="button" class="btn btn-danger">Logout</button>
             </div>
+
+            <div class="col-2"  ></div>
         </div>
-      <div id="mediaPost"></div>
 
-      <!-- Modal -->
-      <div class="modal fade" id="createMediaModal" tabindex="-1" role="dialog" aria-labelledby="createMediaLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="createMediaLabel">Create Post</h5>
-            </div>
-            <div class="modal-body">
+        <!--New Asset Box-->
+        <div class="row align-items-start">
+            <div class="col-2"  ></div>
+
+            <div class="col-8" style="text-align: left;border-bottom:1px solid #222222;">
+              <p>Add Media</p>
+
               <form style="font-size: 10pt;" id="newAssetForm">
                 <div class="mb-3">
                   <label for="fileName" class="form-label">File Name</label>
@@ -82,22 +53,34 @@
                   <label for="UpFile" class="form-label">File to Upload</label>
                   <input type="file" class="form-control" id="UpFile">
                 </div>
+            
+                <button type="button" id="subNewForm" class="btn btn-primary">Submit</button> <br/><br/>
+                
               </form>
             </div>
-            <div class="modal-footer">
-              <button id='submitCreateBtn' type="button" id="subNewForm" class="btn btn-primary">Submit</button>
-              <button id='closeModal' type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
-            </div>
-          </div>
+
+            <div class="col-2"  ></div>
         </div>
-      </div>
+
+        <!-- view Asset Area-->
+        <div class="row align-items-start">
+            <div class="col-2"  ></div>
+
+            <div class="col-8" style="text-align: left;" >
+              <div style="padding:5px;">
+                <button  id = "retMedia" type="button" class="btn btn-primary">View Media</button>
+              </div>
+              <table id="mediaList">
+              </table>
+            </div>
+        </div>
 
       <!-- Modal -->
       <div class="modal fade" id="updateMediaModal" tabindex="-1" role="dialog" aria-labelledby="updateMediaLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
           <div class="modal-content">
             <div class="modal-header">
-              <h5 class="modal-title" id="updateMediaLabel">Edit Post Details</h5>
+              <h5 class="modal-title" id="updateMediaLabel">Edit Media</h5>
             </div>
             <div class="modal-body">
               <form>
