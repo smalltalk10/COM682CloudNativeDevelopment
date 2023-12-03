@@ -94,7 +94,7 @@ li a.activepage{
   color: #294352;
 }
 /* Social icons class for positioning social media icons within navbar */ 
-.socialicons{
+.profileButtons{
   float: right;
   margin-top: 2px;
   margin-bottom: -6px;

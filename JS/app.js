@@ -29,6 +29,12 @@ if (!jwt) {
     window.location.href = 'login.html';
   } else {
     const { username, userID, role } = decodedToken;
+
+    if (role == "Guest User") {
+      // Show the container div
+      document.getElementById('myMedia').style.display = 'none';
+    }
+
     // Event handlers for button clicks
     $(document).ready(function () {
       $("#retMedia").on("click", function() {
@@ -47,8 +53,6 @@ if (!jwt) {
     if (userWelcomeElement) {
       user = username ? username : role;
       userWelcomeElement.innerHTML = "Welcome " + user;
-    } else {
-      console.error("Element with id 'userWelcome' not found");
     }
   
     function searchMedia() {
@@ -182,7 +186,13 @@ if (!jwt) {
         contentType: false,
         processData: false,
         type: "POST",
-      }).done(getMedia);
+        success: function() {
+          getMedia();
+        },
+        error: function(jqXHR) {
+          alert('Error: ' + jqXHR.responseJSON.message + ' If Guest User please Create an Account.');
+        }
+      })
     }
   
     function createEditMediaButton(id) {
@@ -215,7 +225,6 @@ if (!jwt) {
       });
     }
   
-  
     $(document).ready(function () {
       $('#createMediaModal').on('hidden.bs.modal', function () {
         $('#fileName').val('');
@@ -239,7 +248,13 @@ if (!jwt) {
         url: `${endpoints.UIM0}${id}${endpoints.UIM1}`,
         headers: { 'X-ACCESS-TOKEN': jwt },
         data: appendData,
-      }).done(getMedia);
+        success: function() {
+          getMedia();
+        },
+        error: function(jqXHR) {
+          alert('Error: ' + jqXHR.responseJSON.message + ' If Guest User please Create an Account.');
+        }
+      });
     }
   
     function deleteMedia(id) {
@@ -251,7 +266,7 @@ if (!jwt) {
           getMedia();
         },
         error: function(jqXHR) {
-          alert('Error deleting media: ' + jqXHR.responseJSON.message);
+          alert('Error: ' + jqXHR.responseJSON.message);
         }
       });
     }
@@ -287,7 +302,7 @@ if (!jwt) {
             .catch(error => console.error('Error submitting delete profile:', error));
         });
       } catch (error) {
-        alert('Error fetching profile data: ' + error.responseJSON.message);
+        alert('Error: ' + error.responseJSON.message);
       }
     }
   
