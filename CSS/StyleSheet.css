@@ -1,0 +1,153 @@
+/* Soaring Aviation Cascading Style Sheet*/
+
+/* Body element styling for background images; top.png used as background header during full screen,
+background.jpg as main background for site */
+body{
+  background: url(../Images/headerbackground.PNG) no-repeat , url(../Images/background.jpg) no-repeat center fixed;
+  background-color: #222;
+  margin: 0;
+  padding: 0;
+  background-size: 100% 135px, cover;
+  height: 100%;
+}
+
+/* Header div for styling header logo image for each web page */ 
+#headerlogo{
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Container for containing both main and sidebar content */ 
+#container{
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Maincontent div for setting dimensions and keeping it to the left */ 
+#maincontent{
+  width: 75%;
+  margin-left: auto;
+  margin-right: auto;
+}
+/* Content class for containing main page content and making it presentable */ 
+.content{
+  padding-top: 20px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  background-color: rgba(212, 201, 186, .75); 
+  border: 3px solid #294352;
+}
+
+/* Foot div for centering and positioning footer content */ 
+#footer{
+  clear: both;
+  background-color: #294352;
+  overflow: hidden;
+  color: #d4c9ba;
+  text-align: center;
+  position: relative;
+  padding: 10px;
+  bottom: 0;
+}
+
+/* Navigation Menu (Links) */ 
+/* Unordered list for containing links */ 
+ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 3px solid #d4c9ba;
+  background-color: #294352; 
+  font:16px "verdana", san-serif;
+}
+/* List element styling for listing links horizontally */ 
+li {
+  float: left;
+}
+/* Anchor element for styling and setting dimensions of horizontal navbar */ 
+li a {
+  display: inline-block;
+  color: #d4c9ba;
+  padding: 12px 16px;
+  text-decoration: none;
+}
+a:link {
+  color: #d4c9ba;
+  background-color: transparent;
+}
+/* Anchor:hover for changing colour when user hovers over link */ 
+li a:hover {
+  background-color: #222;
+}
+/* Anchor:active for changing colour when user is actively clicking link */ 
+li a:active, a:focus{
+  background-color: #222;
+}
+/* Anchor.activepage class for highlighting currently active page to user */ 
+li a.activepage{
+  background-color: #d4c9ba;
+  color: #294352;
+}
+/* Social icons class for positioning social media icons within navbar */ 
+.profileButtons{
+  float: right;
+  margin-top: 2px;
+  margin-bottom: -6px;
+  margin-right: 5px;
+}
+
+/* Header and paragraph styling for each used type */ 
+h1{
+  text-align: center;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 30px;
+}
+h2{
+  text-align: center;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 24px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+h3{
+  margin-left: 8px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 24px;
+}
+h4{
+  margin-left: 8px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 18px;
+  text-align: center;
+  margin-top: 2px;
+  margin-bottom: 2px;
+}
+p{
+  margin-top: 4px;
+  margin-left: 10px;
+  margin-right: 10px;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  font-size: 14px;
+}
+
+/* Main field div for styling and positioning main field set */ 
+#mainfield{
+  color: #d4c9ba;
+  background-color:rgba(41, 67, 82, .9);
+  font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  border-radius: 15px;
+  margin-bottom: 5px;
+}
+/* Contact legend div for styling legend on contact page */ 
+#contactlegend{
+  display: inline;
+  width: auto;
+  color:#294352;
+  border: 2px solid #294352;
+  background-color: rgba(212, 201, 186, .9); 
+}
