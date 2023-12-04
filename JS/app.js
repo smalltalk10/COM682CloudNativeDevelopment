@@ -70,6 +70,7 @@ if (!jwt) {
     if (role == "Guest User") {
       // Show the container div
       document.getElementById('myMedia').style.display = 'none';
+      document.getElementById('createMediaBtn').style.display = 'none';
     }
 
     // Event handlers for button clicks
