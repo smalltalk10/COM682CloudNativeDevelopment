@@ -1,10 +1,11 @@
 const endpoints = {
-    USERREGISTER: "https://prod-18.uksouth.logic.azure.com/workflows/30a9787bb17a42c0b29183a48e45c250/triggers/manual/paths/invoke/rest/v1/users?api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=X-MkWXYgsJuDjI8E2_rUXywrdXTX4h7kGYnGAWmppDs",
+    CIU: "https://prod-18.uksouth.logic.azure.com/workflows/30a9787bb17a42c0b29183a48e45c250/triggers/manual/paths/invoke/rest/v1/users?api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=X-MkWXYgsJuDjI8E2_rUXywrdXTX4h7kGYnGAWmppDs",
     USERLOGIN: "https://prod-06.uksouth.logic.azure.com/workflows/c8ca13fd1e054238974f1850cc6d5522/triggers/manual/paths/invoke/rest/v1/users/session?api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=H5GfV5kutIM0AEgWmGlWca3QJAav50G3lcd7zoozA5I",
     GUESTLOGIN: "https://prod-24.uksouth.logic.azure.com/workflows/5ff41dbb07a542f5ac56126ea997c143/triggers/manual/paths/invoke/rest/v1/guests/session?api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=7guCUSoc6w8xwdqsSQO-0Tj4UpYsspo-GOt7aDJ4DcE"
 };
 
 $(document).ready(function () {
+    // Stores all the buttons as variables
     const userLoginBtn = $("#userLoginBtn");
     const guestLoginBtn = $("#guestLoginBtn");
     const openRegisterModalBtn = $("#openRegisterModalBtn");
@@ -14,8 +15,8 @@ $(document).ready(function () {
     const registerEmail = $('#registerEmail');
     const registerPassword = $('#registerPassword');
 
+    // User login button when clicked attempts to login reaching out to 'user login' endpoint. If successful, run handle login function passing token data. Else, throw error alert.
     userLoginBtn.click(function () {
-        localStorage.setItem('token', '');
         const submitData = new FormData();
         submitData.append('username', $('#floatingUsername').val());
         submitData.append('password', $('#floatingPassword').val());
@@ -36,6 +37,7 @@ $(document).ready(function () {
         });        
     });
 
+    // Guest login button when clicked reaches out to 'guest login' endpoint. If successful, run handle login function. Else, throw error alert.
     guestLoginBtn.click(function () {
         $.getJSON({
             url: endpoints.GUESTLOGIN,
@@ -62,21 +64,23 @@ $(document).ready(function () {
         registerPassword.val('');
     });
 
+    // Handle login function used to set the recieved Json Web Token from login endpoints. If JWT present, set as token in local storage. Else, alert invalid username or password.
     function handleLoginResponse(data) {
         const jwt = data?.token;
-        localStorage.setItem('token', jwt);
 
         if (jwt) {
+            localStorage.setItem('token', jwt);
             window.location.href = "index.html";
         } else {
             alert("Invalid username or password. Please try again.");
         }
     }
 
+    // Submit register user details if modal button is pressed. If successful, alert registered successfully. Else, throw error alert.
     function submitRegisterUser(data, successCallback) {
         $.ajax({
             type: "POST",
-            url: endpoints.USERREGISTER,
+            url: endpoints.CIU,
             data,
             success: function(response) {
                 if (successCallback) {
