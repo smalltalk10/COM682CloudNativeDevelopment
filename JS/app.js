@@ -14,7 +14,9 @@ const endpoints = {
   UIU0: "https://prod-22.uksouth.logic.azure.com/workflows/c19763a0cd1f4bf6b4791b1584d8a4b2/triggers/manual/paths/invoke/rest/v1/users/",
   UIU1: "?api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=X3W6V7q-snsxjVt_KdwAd05xFcuJ9Vf9PR2Rzby2rPw",
   DIU0: "https://prod-25.uksouth.logic.azure.com/workflows/0b71792ff79b4ba5acbf7ea0c06fde0e/triggers/manual/paths/invoke/rest/v1/users/",
-  DIU1: "?api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=OBCnyO1OH9GSWcNkV5mbfUz6IFTcXVyk1BPj-1n_v5o"
+  DIU1: "?api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=OBCnyO1OH9GSWcNkV5mbfUz6IFTcXVyk1BPj-1n_v5o",
+
+  TRANSLATOR_ENDPOINT: "https://api.cognitive.microsofttranslator.com/translate"
 };
 
 const jwt = localStorage.getItem('token');
@@ -28,11 +30,47 @@ if (!jwt) {
   if (!decodedToken || !decodedToken.role) {
     window.location.href = 'login.html';
   } else {
+  
     const { username, userID, role } = decodedToken;
+
+    // Global variable to store the selected language
+    let selectedLanguage = 'en';
+
+    informationPlaceholder.innerHTML = document.getElementById('informationText').textContent;
+
+    if(document.getElementById('welcomePlaceholder')){
+    user = username ? username : role;
+    welcomePlaceholder.innerHTML = "Welcome " + user;
+    }
+
+    // Function to handle language change
+    function onLanguageChange() {
+      // Update the global variable with the selected language code
+      selectedLanguage = document.getElementById('languageSelect').value;
+
+      // Get the DOM elements with the IDs 'userWelcome' and 'welcomeText'
+      var welcomeText = document.getElementById('welcomeText').textContent;
+      var informationText = document.getElementById('informationText').textContent;
+
+      // Call your translation function
+      translateText(welcomeText, selectedLanguage).then(result => {
+          // Update the HTML content of the element with the translated text
+          welcomePlaceholder.innerHTML = result + " " + user;
+      });
+
+      translateText(informationText, selectedLanguage).then(result => {
+          // Update the HTML content of the element with the translated text
+          informationPlaceholder.innerHTML = result;
+      });
+      hideMedia();
+    }
+
+    document.getElementById('languageSelect')?.addEventListener('change', onLanguageChange);
 
     if (role == "Guest User") {
       // Show the container div
       document.getElementById('myMedia').style.display = 'none';
+      document.getElementById('createMediaBtn').style.display = 'none';
     }
 
     // Event handlers for button clicks
@@ -47,18 +85,11 @@ if (!jwt) {
         window.location.href = 'login.html';
       });
     });
-  
-    var userWelcomeElement = document.getElementById("userWelcome");
-  
-    if (userWelcomeElement) {
-      user = username ? username : role;
-      userWelcomeElement.innerHTML = "Welcome " + user;
-    }
-  
+
     function searchMedia() {
         // Get the value from the search input
         var query = document.getElementById('searchInput').value;
-  
+
         // Check if the query is not empty
         if (query.trim() !== "") {
           getMedia(query)
@@ -66,11 +97,15 @@ if (!jwt) {
             alert('Please enter a search query.');
         }
     }
-  
+
     function getMyMedia() {
       getMedia(username)
     }
-  
+
+    function hideMedia() {
+      $('#mediaPost').empty();
+    }
+
     async function getMedia(query) {
       $('#mediaPost').empty();
       $('#mediaContainer').empty(); // Clear previous media elements
@@ -88,30 +123,30 @@ if (!jwt) {
           var fileType = val["fileType"];
           var split = fileType.split('/');
           var extension = split[split.length - 1];
-  
+
           // Create a new div for each data item
           var mediaDiv = document.createElement('div');
           mediaDiv.className = 'content media-container'; // Added the 'media-container' class
-  
+
           // Append media element inside the new div
           mediaDiv.innerHTML = media;
-  
+
           // Apply CSS style to center the media element
           mediaDiv.style.textAlign = 'center';
-  
+
           // Create table for each data item
           var table = document.createElement('table');
           table.className = 'table';
-  
+
           // Create the table header
           var headerRow = table.insertRow();
           var headerLabels = ["File Name", "Description", "Type", "Username", "Edit", "Delete"];
-  
+
           for (var i = 0; i < headerLabels.length; i++) {
             var headerCell = headerRow.insertCell(i);
             headerCell.textContent = headerLabels[i];
           }
-  
+
           // Create table row
           var row = table.insertRow();
           var cell1 = row.insertCell(0);
@@ -120,7 +155,7 @@ if (!jwt) {
           var cell4 = row.insertCell(3);
           var cell5 = row.insertCell(4);
           var cell6 = row.insertCell(5);
-  
+
           
           switch (extension) {
             case 'video': case 'mp4': case 'mov': case 'wmv': case 'avi': case 'flv': case 'mkv':
@@ -139,35 +174,41 @@ if (!jwt) {
               media = '<p>Unsupported file type</p>';
               break;
           }
-  
+
+          if(selectedLanguage == 'en') {
+            cell2.textContent = val["description"];
+          } else {
+            translateText(val["description"], [selectedLanguage]).then(result => {
+              cell2.textContent = result;
+            })
+          } 
+
           // Populate cells with data
           cell1.textContent = val["fileName"];
-          cell2.textContent = val["description"];
           cell4.textContent = val["userName"];
-  
+
           cell5.appendChild(createEditMediaButton(val["id"]));
           cell6.appendChild(createDeleteButton(val["id"]));
-  
+
           // Append media element inside the new div
           mediaDiv.innerHTML = media;
-  
+
           // Append the table to the new div
           mediaDiv.append(table);
-  
+
           // Append the new div to the desired element
           $('#mediaPost').append(mediaDiv);
         });
       });
     }
-  
+
     async function openCreatePostModal() {
       $('#createMediaModal').modal('show');
       $("#submitCreateBtn").off("click").on("click", function() {
         submitData = new FormData()
-  
+
         //Get form variables and append them to the form data object
         submitData.append("fileName", $("#fileName").val())
-        submitData.append("userID", $("#userID").val())
         submitData.append("description", $("#description").val())
         submitData.append("file", $("#UpFile")[0].files[0])
         submitData.append("fileType", $("#UpFile")[0].files[0].type)
@@ -175,7 +216,7 @@ if (!jwt) {
         $('#createMediaModal').modal('hide');
       });
     }
-  
+
     function submitCreateMedia(submitData) {
       $.ajax({
         url: `${endpoints.CIM}`,
@@ -190,23 +231,23 @@ if (!jwt) {
           getMedia();
         },
         error: function(jqXHR) {
-          alert('Error: ' + jqXHR.responseJSON.message + ' If Guest User please Create an Account.');
+          alert('Error: ' + jqXHR.responseJSON.message);
         }
       })
     }
-  
+
     function createEditMediaButton(id) {
       return createButton('Edit', 'btn btn-info', function () {
         openEditMediaForm(id);
       });
     }
-  
+
     function createDeleteButton(id) {
       return createButton('Delete', 'btn btn-danger', function () {
         deleteMedia(id);
       });
     }
-  
+
     function createButton(text, className, clickHandler) {
       const button = document.createElement('button');
       button.type = 'button';
@@ -215,7 +256,7 @@ if (!jwt) {
       button.addEventListener('click', clickHandler);
       return button;
     }
-  
+
     function openEditMediaForm(id) {
       $('#updateMediaModal').modal('show');
       $("#submitEditButton").off("click").on("click", function() {
@@ -224,7 +265,7 @@ if (!jwt) {
         $('#updateMediaModal').modal('hide');
       });
     }
-  
+
     $(document).ready(function () {
       $('#createMediaModal').on('hidden.bs.modal', function () {
         $('#fileName').val('');
@@ -235,13 +276,13 @@ if (!jwt) {
         $('#appendFileName').val('');
         $('#appendDescription').val('');
       });
-  
+
       $('#editProfileModal').on('hidden.bs.modal', function () {
         $('#registerEmail').val('');
         $('#registerPassword').val('');
       });
     });
-  
+
     function submitEditMedia(id, appendData) {
       $.ajax({
         type: 'PUT',
@@ -249,28 +290,36 @@ if (!jwt) {
         headers: { 'X-ACCESS-TOKEN': jwt },
         data: appendData,
         success: function() {
-          getMedia();
+          if (!document.getElementById('myMedia')) {
+            getMyMedia();
+          } else {
+            getMedia();
+          }
         },
         error: function(jqXHR) {
           alert('Error: ' + jqXHR.responseJSON.message + ' If Guest User please Create an Account.');
         }
       });
     }
-  
+
     function deleteMedia(id) {
       $.ajax({
         type: 'DELETE',
         url: `${endpoints.DIM0}${id}${endpoints.DIM1}`,
         headers: { 'X-ACCESS-TOKEN': jwt },
         success: function() {
-          getMedia();
+          if (!document.getElementById('myMedia')) {
+            getMyMedia();
+          } else {
+            getMedia();
+          }
         },
         error: function(jqXHR) {
           alert('Error: ' + jqXHR.responseJSON.message);
         }
       });
     }
-  
+
     async function openEditProfileModal() {
       try {
         const data = await $.ajax({
@@ -279,13 +328,13 @@ if (!jwt) {
           method: 'GET',
           dataType: 'json',
         });
-  
+
         $('#editProfileModal').modal('show');
         document.getElementById("profileUsername").innerHTML = data["username"];
         document.getElementById("profileEmail").innerHTML = data["email"];
         document.getElementById("profileRole").innerHTML = data["role"];
         document.getElementById("profileCreateTime").innerHTML = new Date(data["createTime"]).toLocaleDateString();
-  
+
         $("#subEditProfileBtn").off("click").on("click", function() {
           const updateData = {
             "email": $('#registerEmail').val(),
@@ -295,7 +344,7 @@ if (!jwt) {
             .then(() => $('#editProfileModal').modal('hide'))
             .catch(error => console.error('Error submitting edit profile:', error));
         });
-  
+
         $("#subDeleteProfileBtn").off("click").on("click", function() {
           submitDeleteProfile()
             .then(() => $('#editProfileModal').modal('hide'))
@@ -305,14 +354,14 @@ if (!jwt) {
         alert('Error: ' + error.responseJSON.message);
       }
     }
-  
+
     $(document).ready(function() {
       $('#editProfileModal').on('hidden.bs.modal', function() {
           $('#registerEmail').val('');
           $('#registerPassword').val('');
       });
     });
-  
+
     async function submitEditProfile(data) {
       $.ajax({
         type: 'PUT',
@@ -321,7 +370,7 @@ if (!jwt) {
         data,
       }).done();
     }
-  
+
     async function submitDeleteProfile(data) {
       $.ajax({
         type: 'DELETE',
@@ -332,6 +381,44 @@ if (!jwt) {
           localStorage.removeItem('token');
           window.location.href = 'login.html';
       });
+    
     }
   }
+
+  function translateText(text, toLanguage) {
+    const key = "e08b33492e4049bdb2acda2ab3d8f7ad"; // "<your-translator-key>"
+    const location = "uksouth"; // "<YOUR-RESOURCE-LOCATION>"
+
+    const params = {
+      'api-version': '3.0',
+      'from': 'en',
+      'to': toLanguage
+    };
+
+    const headers = new Headers({
+      'Ocp-Apim-Subscription-Key': key,
+      'Ocp-Apim-Subscription-Region': location,
+      'Content-type': 'application/json',
+      'X-ClientTraceId': Math.random().toString()
+    });
+
+    const body = [{
+      'text': text
+    }];
+
+    return fetch(endpoints.TRANSLATOR_ENDPOINT + '?' + new URLSearchParams(params), {
+      method: 'POST',
+      headers: headers,
+      body: JSON.stringify(body)
+    })
+    .then(response => response.json())
+    .then(jsonResponse => {
+      return (jsonResponse)[0]?.translations[0]?.text;
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      throw error;
+    });
+  }
 }
+  

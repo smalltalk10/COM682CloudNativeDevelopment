@@ -1,20 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="author" content="Niall Morrissey">
-    <meta name="keywords" content="Aviation, Aircraft, Flying, Pilot, History, Enthusiast, Learning">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Media Sharing Platform</title>
-    <link rel="stylesheet" href="CSS/bootstrap.min.css">
-    <link rel="stylesheet" href="./CSS/StyleSheet.css">
-    <link rel="shortcut icon" type="image/ico" href="./Images/favicon.png"/>
-    <script defer src="JS/jquery-3.6.0.min.js"></script>
-    <script defer src="JS/bootstrap.bundle.min.js"></script>
-    <script defer src="JS/app.js"></script>
-</head>
+  <head>
+      <meta charset="UTF-8">
+      <meta name="author" content="Niall Morrissey">
+      <meta name="keywords" content="Aviation, Aircraft, Flying, Pilot, History, Enthusiast, Learning">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Media Sharing Platform</title>
+      <link rel="stylesheet" href="CSS/bootstrap.min.css">
+      <link rel="stylesheet" href="./CSS/StyleSheet.css">
+      <link rel="shortcut icon" type="image/ico" href="./Images/favicon.png"/>
+      <script defer src="JS/jquery-3.6.0.min.js"></script>
+      <script defer src="JS/bootstrap.bundle.min.js"></script>
+      <script defer src="JS/app.js"></script>
+  </head>
   
   <body>
+    <iframe src="https://webchat.botframework.com/embed/B00787301-Language-bot?s=dCWwyO6LTss.Z_nWV9c6RFpuWZnLX7g1FyWxKikqUYdzcc0IIEmXDe8" class="bot"></iframe>
     <header> <!-- Header logo image at top of each page-->  
       <img id="headerlogo" src="./Images/headerlogo.PNG" alt="Soaring Aviation Website Header" >   
     </header>
@@ -26,6 +27,14 @@
 
           <li class="profileButtons"><button id="logoutBtn" type="button" class="btn btn-danger">Logout</button></li>
           <li class="profileButtons"><button id="editProfileBtn" type="button" class="btn btn-info">Edit Profile</button></li>
+          <li class="profileButtons">
+            <!-- Select Language Dropdown -->
+            <select id="languageSelect" class="form-control" onclick="onLanguageChange()">
+              <option value="en">English</option>
+              <option value="fr">French</option>
+              <option value="es">Spanish</option>
+            </select>
+          </li>
         </ul>
       </div>
       <div id="maincontent">
@@ -34,31 +43,31 @@
             <div class="row align-items-center">
                 <div class="col-2"></div>
                 <div class="col-8 text-center">
-                    <h1 id="userWelcome">Welcome</h1>
-                    <p>Welcome to Soaring Aviation Media share, a connected website to share Images, Videos, and Audio with other aviation enthusiasts! 
-                        Click "View Media" to check out other users' posts.</p>
+                    <h1 id="welcomePlaceholder"></h1>
+                    <p id="informationPlaceholder"></p>
                 </div>
                 <div class="col-2"></div>
             </div>
-    
+
             <!-- View Asset Area -->
             <div class="row align-items-center">
-                <div class="col-8"></div>
-                <div class="col-8" style="text-align: left;">
-                    <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                            <button id="createMediaBtn" class="btn btn-info" type="button" style="margin-left: 10px;">Create Post</button>
-                            <button id="retMedia" class="btn btn-primary" type="button" style="margin-right: 25px;">View Posts</button>
-                        </div>
-                        <input type="text" id="searchInput" class="form-control" placeholder="Username..." style="margin-left: 10px;">
-                        <div class="input-group-append">
-                            <button class="btn btn-secondary" type="button" style="margin-left: 10px;" onclick="searchMedia()">Search User</button>
-                        </div>
-                    </div>
+              <div class="col-8"></div>
+              <div class="col-8" style="text-align: left;">
+                <div class="input-group mb-3">
+                  <div class="input-group-prepend" style="margin-left: 10px;">
+                    <button id="createMediaBtn" class="btn btn-info" type="button"  >Create Post</button>
+                    <button id="retMedia" class="btn btn-primary" type="button" style="margin-right: 25px;">View Posts</button>
+                  </div>
+                  <input type="text" id="searchInput" class="form-control" placeholder="Username..." style="margin-left: 10px;">
+                  <div class="input-group-append">
+                    <button class="btn btn-secondary" type="button" style="margin-left: 10px;" onclick="searchMedia()">Search User</button>
+                  </div>
                 </div>
+              </div>
             </div>
         </div>
-      <div id="mediaPost"></div>
+        <div id="mediaPost"></div>
+      </div>
 
       <!-- Modal -->
       <div class="modal fade" id="createMediaModal" tabindex="-1" role="dialog" aria-labelledby="createMediaLabel" aria-hidden="true">
@@ -167,6 +176,11 @@
           </div>
         </div>
       </div>
+    </div>
+    <div style="display: none;">
+      <p id="welcomeText">Welcome</p>
+      <p id="informationText">Welcome to Soaring Aviation Media share, a connected website to share Images, 
+        Videos, and Audio with other aviation enthusiasts! Click "View Media" to check out other users' posts.</p>
     </div>
   </body>
 </html>

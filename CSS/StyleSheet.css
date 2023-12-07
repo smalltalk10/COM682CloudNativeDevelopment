@@ -54,6 +54,16 @@ body{
   bottom: 0;
 }
 
+.bot{
+  right:0;
+  bottom:0px;
+  position:fixed;
+  width:18%;
+  z-index:9999;
+  height:350px;
+  background-attachment: fixed;
+}
+
 /* Navigation Menu (Links) */ 
 /* Unordered list for containing links */ 
 ul {

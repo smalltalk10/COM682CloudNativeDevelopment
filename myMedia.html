@@ -1,20 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="author" content="Niall Morrissey">
-    <meta name="keywords" content="Aviation, Aircraft, Flying, Pilot, History, Enthusiast, Learning">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Posts</title>
-    <link rel="stylesheet" href="CSS/bootstrap.min.css">
-    <link rel="stylesheet" href="./CSS/StyleSheet.css">
-    <link rel="shortcut icon" type="image/ico" href="./Images/favicon.png"/>
-    <script defer src="JS/jquery-3.6.0.min.js"></script>
-    <script defer src="JS/bootstrap.bundle.min.js"></script>
-    <script defer src="JS/app.js"></script>
-</head>
+  <head>
+      <meta charset="UTF-8">
+      <meta name="author" content="Niall Morrissey">
+      <meta name="keywords" content="Aviation, Aircraft, Flying, Pilot, History, Enthusiast, Learning">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>My Posts</title>
+      <link rel="stylesheet" href="CSS/bootstrap.min.css">
+      <link rel="stylesheet" href="./CSS/StyleSheet.css">
+      <link rel="shortcut icon" type="image/ico" href="./Images/favicon.png"/>
+      <script defer src="JS/jquery-3.6.0.min.js"></script>
+      <script defer src="JS/bootstrap.bundle.min.js"></script>
+      <script defer src="JS/app.js"></script>
+  </head>
   
   <body onload="getMyMedia()">
+    <iframe src="https://webchat.botframework.com/embed/B00787301-Language-bot?s=dCWwyO6LTss.Z_nWV9c6RFpuWZnLX7g1FyWxKikqUYdzcc0IIEmXDe8" class="bot"></iframe>
     <header> <!-- Header logo image at top of each page-->  
       <img id="headerlogo" src="./Images/headerlogo.PNG" alt="Soaring Aviation Website Header" >   
     </header>
@@ -26,6 +27,14 @@
 
           <li class="profileButtons"><button id="logoutBtn" type="button" class="btn btn-danger">Logout</button></li>
           <li class="profileButtons"><button id="editProfileBtn" type="button" class="btn btn-info">Edit Profile</button></li>
+          <li class="profileButtons">
+            <!-- Select Language Dropdown -->
+            <select class="form-control" onclick="onLanguageChange()">
+              <option value="en">English</option>
+              <option value="fr">French</option>
+              <option value="es">Spanish</option>
+            </select>
+          </li>
         </ul>
       </div>
       <div id="maincontent">
@@ -35,7 +44,7 @@
                 <div class="col-2"></div>
                 <div class="col-8 text-center">
                     <h1>Your Posts</h1>
-                    <p>From here you can see all of your posts! Feel free to edit and delete them from here!</p>
+                    <p id="informationPlaceholder"></p>
                 </div>
                 <div class="col-2"></div>
             </div>
@@ -117,6 +126,10 @@
           </div>
         </div>
       </div>
+    </div>
+    <div style="display: none;">
+      <p id="welcomeText">Your Posts</p>
+      <p id="informationText">From here you can see all of your posts! Feel free to edit and delete them from here!</p>
     </div>
   </body>
 </html>
