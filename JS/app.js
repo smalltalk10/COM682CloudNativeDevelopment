@@ -209,7 +209,6 @@ if (!jwt) {
 
         //Get form variables and append them to the form data object
         submitData.append("fileName", $("#fileName").val())
-        submitData.append("userID", $("#userID").val())
         submitData.append("description", $("#description").val())
         submitData.append("file", $("#UpFile")[0].files[0])
         submitData.append("fileType", $("#UpFile")[0].files[0].type)
@@ -232,7 +231,7 @@ if (!jwt) {
           getMedia();
         },
         error: function(jqXHR) {
-          alert('Error: ' + jqXHR.responseJSON.message + ' If Guest User please Create an Account.');
+          alert('Error: ' + jqXHR.responseJSON.message);
         }
       })
     }
@@ -386,14 +385,14 @@ if (!jwt) {
     }
   }
 
-  function translateText(text, toLanguages) {
+  function translateText(text, toLanguage) {
     const key = "e08b33492e4049bdb2acda2ab3d8f7ad"; // "<your-translator-key>"
     const location = "uksouth"; // "<YOUR-RESOURCE-LOCATION>"
 
     const params = {
       'api-version': '3.0',
       'from': 'en',
-      'to': toLanguages
+      'to': toLanguage
     };
 
     const headers = new Headers({
