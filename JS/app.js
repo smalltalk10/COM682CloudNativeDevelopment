@@ -17,8 +17,11 @@ const endpoints = {
   DIU1: "?api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=OBCnyO1OH9GSWcNkV5mbfUz6IFTcXVyk1BPj-1n_v5o"
 };
 
+let selectedLanguage = 'en';
+// Retrieves the Json Web Token stored during the login process for both Guests and Users
 const jwt = localStorage.getItem('token');
 
+// If decoded token cannot be found with role specified, redirect back to login page, else continue.
 if (!jwt) {
   window.location.href = 'login.html';
 } else {
@@ -28,10 +31,24 @@ if (!jwt) {
   if (!decodedToken || !decodedToken.role) {
     window.location.href = 'login.html';
   } else {
+<<<<<<< Updated upstream
     const { username, userID, role } = decodedToken;
 
+=======
+  
+    // Set username, userID, and role properties from the token as variables to be used throughout the webpage
+    const { username, userID, role } = decodedToken;
+
+    informationPlaceholder.innerHTML = document.getElementById('informationText').textContent;
+
+    if(document.getElementById('welcomePlaceholder')){
+    user = username ? username : role;
+    welcomePlaceholder.innerHTML = "Welcome " + user;
+    }
+
+    //Hide create and My Posts buttons if role is Guest
+>>>>>>> Stashed changes
     if (role == "Guest User") {
-      // Show the container div
       document.getElementById('myMedia').style.display = 'none';
     }
 
@@ -47,6 +64,7 @@ if (!jwt) {
         window.location.href = 'login.html';
       });
     });
+<<<<<<< Updated upstream
   
     var userWelcomeElement = document.getElementById("userWelcome");
   
@@ -55,6 +73,10 @@ if (!jwt) {
       userWelcomeElement.innerHTML = "Welcome " + user;
     }
   
+=======
+
+    //Search Media function
+>>>>>>> Stashed changes
     function searchMedia() {
         // Get the value from the search input
         var query = document.getElementById('searchInput').value;
@@ -70,9 +92,17 @@ if (!jwt) {
     function getMyMedia() {
       getMedia(username)
     }
+<<<<<<< Updated upstream
   
+=======
+
+    function hideMedia() {
+      $('#mediaContainer').empty();
+    }
+
+    // Function reaches out to 'read all media' to get selected media posts using query parameter or all posts if no query specified
+>>>>>>> Stashed changes
     async function getMedia(query) {
-      $('#mediaPost').empty();
       $('#mediaContainer').empty(); // Clear previous media elements
       $.getJSON({
         url: endpoints.RAM,
@@ -83,6 +113,7 @@ if (!jwt) {
           if (query && query !== val['userName']) {
             return;
           }
+<<<<<<< Updated upstream
           // Create media element
           let media;
           var fileType = val["fileType"];
@@ -104,6 +135,15 @@ if (!jwt) {
           table.className = 'table';
   
           // Create the table header
+=======
+          // First formats the layout of each media post and respective metadata 
+          var mediaDiv = document.createElement('div');
+          mediaDiv.className = 'content media-container';
+
+          var table = document.createElement('table');
+          table.className = 'table';
+
+>>>>>>> Stashed changes
           var headerRow = table.insertRow();
           var headerLabels = ["File Name", "Description", "Type", "Username", "Edit", "Delete"];
   
@@ -111,8 +151,12 @@ if (!jwt) {
             var headerCell = headerRow.insertCell(i);
             headerCell.textContent = headerLabels[i];
           }
+<<<<<<< Updated upstream
   
           // Create table row
+=======
+
+>>>>>>> Stashed changes
           var row = table.insertRow();
           var cell1 = row.insertCell(0);
           var cell2 = row.insertCell(1);
@@ -120,8 +164,36 @@ if (!jwt) {
           var cell4 = row.insertCell(3);
           var cell5 = row.insertCell(4);
           var cell6 = row.insertCell(5);
+<<<<<<< Updated upstream
   
           
+=======
+
+          if(selectedLanguage == 'en') {
+            cell2.textContent = val["description"];
+          } else {
+            translateText(val["description"], [selectedLanguage]).then(result => {
+              cell2.textContent = result;
+            })
+          } 
+
+          cell1.textContent = val["fileName"];
+          cell4.textContent = val["userName"];
+
+          cell5.appendChild(createEditMediaButton(val["id"]));
+          cell6.appendChild(createDeleteButton(val["id"]));
+
+          // Creates the media variable and extract the media file type as variable extension
+          let media;
+          var fileType = val["fileType"];
+          var split = fileType.split('/');
+          var extension = split[split.length - 1];
+
+          mediaDiv.innerHTML = media;
+          mediaDiv.style.textAlign = 'center';
+
+          // Media extension type is used in switch case to select the appropiate media format to store the media retrieved from the blob store. 
+>>>>>>> Stashed changes
           switch (extension) {
             case 'video': case 'mp4': case 'mov': case 'wmv': case 'avi': case 'flv': case 'mkv':
               media = `<video controls width="750"><source src="${endpoints.BLOB_ACCOUNT}${val["filePath"]}" type="video/mp4"></video>`;
@@ -139,6 +211,7 @@ if (!jwt) {
               media = '<p>Unsupported file type</p>';
               break;
           }
+<<<<<<< Updated upstream
   
           // Populate cells with data
           cell1.textContent = val["fileName"];
@@ -160,6 +233,18 @@ if (!jwt) {
       });
     }
   
+=======
+
+          mediaDiv.innerHTML = media;
+          mediaDiv.append(table);
+
+          $('#mediaContainer').append(mediaDiv);
+        });
+      });
+    }
+
+    // Opens the create media modal
+>>>>>>> Stashed changes
     async function openCreatePostModal() {
       $('#createMediaModal').modal('show');
       $("#submitCreateBtn").off("click").on("click", function() {
@@ -175,7 +260,12 @@ if (!jwt) {
         $('#createMediaModal').modal('hide');
       });
     }
+<<<<<<< Updated upstream
   
+=======
+
+    // Function reaches out the 'create individual media' endpoint with the specified data, has error catching for e.g. an unauthorised response.
+>>>>>>> Stashed changes
     function submitCreateMedia(submitData) {
       $.ajax({
         url: `${endpoints.CIM}`,
@@ -194,19 +284,30 @@ if (!jwt) {
         }
       })
     }
+<<<<<<< Updated upstream
   
+=======
+
+    // Creates the Edit and Delete media buttons
+>>>>>>> Stashed changes
     function createEditMediaButton(id) {
       return createButton('Edit', 'btn btn-info', function () {
         openEditMediaForm(id);
       });
     }
+<<<<<<< Updated upstream
   
+=======
+>>>>>>> Stashed changes
     function createDeleteButton(id) {
       return createButton('Delete', 'btn btn-danger', function () {
         deleteMedia(id);
       });
     }
+<<<<<<< Updated upstream
   
+=======
+>>>>>>> Stashed changes
     function createButton(text, className, clickHandler) {
       const button = document.createElement('button');
       button.type = 'button';
@@ -215,7 +316,12 @@ if (!jwt) {
       button.addEventListener('click', clickHandler);
       return button;
     }
+<<<<<<< Updated upstream
   
+=======
+
+    // Opens the Edit media modal
+>>>>>>> Stashed changes
     function openEditMediaForm(id) {
       $('#updateMediaModal').modal('show');
       $("#submitEditButton").off("click").on("click", function() {
@@ -224,6 +330,7 @@ if (!jwt) {
         $('#updateMediaModal').modal('hide');
       });
     }
+<<<<<<< Updated upstream
   
     $(document).ready(function () {
       $('#createMediaModal').on('hidden.bs.modal', function () {
@@ -242,6 +349,10 @@ if (!jwt) {
       });
     });
   
+=======
+    
+    // Function reaches out the 'update individual media' endpoint with appended data, has error catching for e.g. an unauthorised response.
+>>>>>>> Stashed changes
     function submitEditMedia(id, appendData) {
       $.ajax({
         type: 'PUT',
@@ -252,11 +363,16 @@ if (!jwt) {
           getMedia();
         },
         error: function(jqXHR) {
-          alert('Error: ' + jqXHR.responseJSON.message + ' If Guest User please Create an Account.');
+          alert('Error: ' + jqXHR.responseJSON.message);
         }
       });
     }
+<<<<<<< Updated upstream
   
+=======
+
+   // Function reaches out the 'delete individual media' endpoint, has error catching for e.g. an unauthorised response.
+>>>>>>> Stashed changes
     function deleteMedia(id) {
       $.ajax({
         type: 'DELETE',
@@ -270,7 +386,12 @@ if (!jwt) {
         }
       });
     }
+<<<<<<< Updated upstream
   
+=======
+
+    // Open the edit profile modal. Initially reaches out to 'read individual media' endpoint to display user details within the modal.
+>>>>>>> Stashed changes
     async function openEditProfileModal() {
       try {
         const data = await $.ajax({
@@ -312,26 +433,105 @@ if (!jwt) {
           $('#registerPassword').val('');
       });
     });
+<<<<<<< Updated upstream
   
+=======
+
+    // Function reaches out the 'update individual user' endpoint, has error catching for e.g. an unauthorised response.
+>>>>>>> Stashed changes
     async function submitEditProfile(data) {
       $.ajax({
         type: 'PUT',
         url: `${endpoints.UIU0}${userID}${endpoints.UIU1}`,
         headers: { 'X-ACCESS-TOKEN': jwt },
         data,
-      }).done();
+        error: function(jqXHR) {
+          alert('Error: ' + jqXHR.responseJSON.message);
+        }
+      });
     }
+<<<<<<< Updated upstream
   
+=======
+
+    // Function reaches out the 'delete individual user' endpoint, has error catching for e.g. an unauthorised response.
+    // Removes token and redirects user back to login screen if successful
+>>>>>>> Stashed changes
     async function submitDeleteProfile(data) {
       $.ajax({
         type: 'DELETE',
         url: `${endpoints.DIU0}${userID}${endpoints.DIU1}`,
         headers: { 'X-ACCESS-TOKEN': jwt },
         data,
-      }).done(function() {
+        success: function() {
           localStorage.removeItem('token');
           window.location.href = 'login.html';
+        },
+        error: function(jqXHR) {
+          alert('Error: ' + jqXHR.responseJSON.message);
+        }
+      });
+    }
+<<<<<<< Updated upstream
+  }
+}
+=======
+
+    // Handles language selecet 
+    function onLanguageChange() {
+      selectedLanguage = document.getElementById('languageSelect').value;
+      var welcomeText = document.getElementById('welcomeText').textContent;
+      var informationText = document.getElementById('informationText').textContent;
+
+      translateText(welcomeText, selectedLanguage).then(result => {
+          welcomePlaceholder.innerHTML = result + " " + user;
+      });
+
+      translateText(informationText, selectedLanguage).then(result => {
+          informationPlaceholder.innerHTML = result;
+      });
+
+      hideMedia();
+    }
+    document.getElementById('languageSelect')?.addEventListener("change", onLanguageChange);
+
+    // Translates to selected language
+    function translateText(text, toLanguage) {
+      const key = "e08b33492e4049bdb2acda2ab3d8f7ad"; // My translator key
+      const location = "uksouth"; // My translator location
+
+      const params = {
+        'api-version': '3.0',
+        'from': 'en',
+        'to': toLanguage
+      };
+
+      const headers = new Headers({
+        'Ocp-Apim-Subscription-Key': key,
+        'Ocp-Apim-Subscription-Region': location,
+        'Content-type': 'application/json',
+        'X-ClientTraceId': Math.random().toString()
+      });
+
+      const body = [{
+        'text': text
+      }];
+
+      return fetch(endpoints.TRANSLATOR_ENDPOINT + '?' + new URLSearchParams(params), {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify(body)
+      })
+      .then(response => response.json())
+      .then(jsonResponse => {
+        return (jsonResponse)[0]?.translations[0]?.text;
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        throw error;
       });
     }
   }
 }
+  
+>>>>>>> Stashed changes
