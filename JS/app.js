@@ -19,8 +19,11 @@ const endpoints = {
   TRANSLATOR_ENDPOINT: "https://api.cognitive.microsofttranslator.com/translate"
 };
 
+let selectedLanguage = 'en';
+// Retrieves the Json Web Token stored during the login process for both Guests and Users
 const jwt = localStorage.getItem('token');
 
+// If decoded token cannot be found with role specified, redirect back to login page, else continue.
 if (!jwt) {
   window.location.href = 'login.html';
 } else {
@@ -31,10 +34,8 @@ if (!jwt) {
     window.location.href = 'login.html';
   } else {
   
+    // Set username, userID, and role properties from the token as variables to be used throughout the webpage
     const { username, userID, role } = decodedToken;
-
-    // Global variable to store the selected language
-    let selectedLanguage = 'en';
 
     informationPlaceholder.innerHTML = document.getElementById('informationText').textContent;
 
@@ -43,32 +44,8 @@ if (!jwt) {
     welcomePlaceholder.innerHTML = "Welcome " + user;
     }
 
-    // Function to handle language change
-    function onLanguageChange() {
-      // Update the global variable with the selected language code
-      selectedLanguage = document.getElementById('languageSelect').value;
-
-      // Get the DOM elements with the IDs 'userWelcome' and 'welcomeText'
-      var welcomeText = document.getElementById('welcomeText').textContent;
-      var informationText = document.getElementById('informationText').textContent;
-
-      // Call your translation function
-      translateText(welcomeText, selectedLanguage).then(result => {
-          // Update the HTML content of the element with the translated text
-          welcomePlaceholder.innerHTML = result + " " + user;
-      });
-
-      translateText(informationText, selectedLanguage).then(result => {
-          // Update the HTML content of the element with the translated text
-          informationPlaceholder.innerHTML = result;
-      });
-      hideMedia();
-    }
-
-    document.getElementById('languageSelect')?.addEventListener('change', onLanguageChange);
-
+    //Hide create and My Posts buttons if role is Guest
     if (role == "Guest User") {
-      // Show the container div
       document.getElementById('myMedia').style.display = 'none';
       document.getElementById('createMediaBtn').style.display = 'none';
     }
@@ -86,6 +63,7 @@ if (!jwt) {
       });
     });
 
+    //Search Media function
     function searchMedia() {
         // Get the value from the search input
         var query = document.getElementById('searchInput').value;
@@ -103,11 +81,11 @@ if (!jwt) {
     }
 
     function hideMedia() {
-      $('#mediaPost').empty();
+      $('#mediaContainer').empty();
     }
 
+    // Function reaches out to 'read all media' to get selected media posts using query parameter or all posts if no query specified
     async function getMedia(query) {
-      $('#mediaPost').empty();
       $('#mediaContainer').empty(); // Clear previous media elements
       $.getJSON({
         url: endpoints.RAM,
@@ -118,27 +96,13 @@ if (!jwt) {
           if (query && query !== val['userName']) {
             return;
           }
-          // Create media element
-          let media;
-          var fileType = val["fileType"];
-          var split = fileType.split('/');
-          var extension = split[split.length - 1];
-
-          // Create a new div for each data item
+          // First formats the layout of each media post and respective metadata 
           var mediaDiv = document.createElement('div');
-          mediaDiv.className = 'content media-container'; // Added the 'media-container' class
+          mediaDiv.className = 'content media-container';
 
-          // Append media element inside the new div
-          mediaDiv.innerHTML = media;
-
-          // Apply CSS style to center the media element
-          mediaDiv.style.textAlign = 'center';
-
-          // Create table for each data item
           var table = document.createElement('table');
           table.className = 'table';
 
-          // Create the table header
           var headerRow = table.insertRow();
           var headerLabels = ["File Name", "Description", "Type", "Username", "Edit", "Delete"];
 
@@ -147,7 +111,6 @@ if (!jwt) {
             headerCell.textContent = headerLabels[i];
           }
 
-          // Create table row
           var row = table.insertRow();
           var cell1 = row.insertCell(0);
           var cell2 = row.insertCell(1);
@@ -156,7 +119,31 @@ if (!jwt) {
           var cell5 = row.insertCell(4);
           var cell6 = row.insertCell(5);
 
-          
+          if(selectedLanguage == 'en') {
+            cell2.textContent = val["description"];
+          } else {
+            translateText(val["description"], [selectedLanguage]).then(result => {
+              cell2.textContent = result;
+            })
+          } 
+
+          cell1.textContent = val["fileName"];
+          cell4.textContent = val["userName"];
+
+          cell5.appendChild(createEditMediaButton(val["id"]));
+          cell6.appendChild(createDeleteButton(val["id"]));
+
+
+          // Creates the media variable and extract the media file type as variable extension
+          let media;
+          var fileType = val["fileType"];
+          var split = fileType.split('/');
+          var extension = split[split.length - 1];
+
+          mediaDiv.innerHTML = media;
+          mediaDiv.style.textAlign = 'center';
+
+          // Media extension type is used in switch case to select the appropiate media format to store the media retrieved from the blob store. 
           switch (extension) {
             case 'video': case 'mp4': case 'mov': case 'wmv': case 'avi': case 'flv': case 'mkv':
               media = `<video controls width="750"><source src="${endpoints.BLOB_ACCOUNT}${val["filePath"]}" type="video/mp4"></video>`;
@@ -175,33 +162,15 @@ if (!jwt) {
               break;
           }
 
-          if(selectedLanguage == 'en') {
-            cell2.textContent = val["description"];
-          } else {
-            translateText(val["description"], [selectedLanguage]).then(result => {
-              cell2.textContent = result;
-            })
-          } 
-
-          // Populate cells with data
-          cell1.textContent = val["fileName"];
-          cell4.textContent = val["userName"];
-
-          cell5.appendChild(createEditMediaButton(val["id"]));
-          cell6.appendChild(createDeleteButton(val["id"]));
-
-          // Append media element inside the new div
           mediaDiv.innerHTML = media;
-
-          // Append the table to the new div
           mediaDiv.append(table);
 
-          // Append the new div to the desired element
-          $('#mediaPost').append(mediaDiv);
+          $('#mediaContainer').append(mediaDiv);
         });
       });
     }
 
+    // Opens the create media modal
     async function openCreatePostModal() {
       $('#createMediaModal').modal('show');
       $("#submitCreateBtn").off("click").on("click", function() {
@@ -217,6 +186,7 @@ if (!jwt) {
       });
     }
 
+    // Function reaches out the 'create individual media' endpoint with the specified data, has error catching for e.g. an unauthorised response.
     function submitCreateMedia(submitData) {
       $.ajax({
         url: `${endpoints.CIM}`,
@@ -236,18 +206,17 @@ if (!jwt) {
       })
     }
 
+    // Creates the Edit and Delete media buttons
     function createEditMediaButton(id) {
       return createButton('Edit', 'btn btn-info', function () {
         openEditMediaForm(id);
       });
     }
-
     function createDeleteButton(id) {
       return createButton('Delete', 'btn btn-danger', function () {
         deleteMedia(id);
       });
     }
-
     function createButton(text, className, clickHandler) {
       const button = document.createElement('button');
       button.type = 'button';
@@ -257,6 +226,7 @@ if (!jwt) {
       return button;
     }
 
+    // Opens the Edit media modal
     function openEditMediaForm(id) {
       $('#updateMediaModal').modal('show');
       $("#submitEditButton").off("click").on("click", function() {
@@ -265,24 +235,8 @@ if (!jwt) {
         $('#updateMediaModal').modal('hide');
       });
     }
-
-    $(document).ready(function () {
-      $('#createMediaModal').on('hidden.bs.modal', function () {
-        $('#fileName').val('');
-        $('#description').val('');
-        $('#file').val('');
-      });
-      $('#updateMediaModal').on('hidden.bs.modal', function () {
-        $('#appendFileName').val('');
-        $('#appendDescription').val('');
-      });
-
-      $('#editProfileModal').on('hidden.bs.modal', function () {
-        $('#registerEmail').val('');
-        $('#registerPassword').val('');
-      });
-    });
-
+    
+    // Function reaches out the 'update individual media' endpoint with appended data, has error catching for e.g. an unauthorised response.
     function submitEditMedia(id, appendData) {
       $.ajax({
         type: 'PUT',
@@ -297,11 +251,12 @@ if (!jwt) {
           }
         },
         error: function(jqXHR) {
-          alert('Error: ' + jqXHR.responseJSON.message + ' If Guest User please Create an Account.');
+          alert('Error: ' + jqXHR.responseJSON.message);
         }
       });
     }
 
+   // Function reaches out the 'delete individual media' endpoint, has error catching for e.g. an unauthorised response.
     function deleteMedia(id) {
       $.ajax({
         type: 'DELETE',
@@ -320,6 +275,7 @@ if (!jwt) {
       });
     }
 
+    // Open the edit profile modal. Initially reaches out to 'read individual media' endpoint to display user details within the modal.
     async function openEditProfileModal() {
       try {
         const data = await $.ajax({
@@ -362,63 +318,91 @@ if (!jwt) {
       });
     });
 
+    // Function reaches out the 'update individual user' endpoint, has error catching for e.g. an unauthorised response.
     async function submitEditProfile(data) {
       $.ajax({
         type: 'PUT',
         url: `${endpoints.UIU0}${userID}${endpoints.UIU1}`,
         headers: { 'X-ACCESS-TOKEN': jwt },
         data,
-      }).done();
+        error: function(jqXHR) {
+          alert('Error: ' + jqXHR.responseJSON.message);
+        }
+      });
     }
 
+    // Function reaches out the 'delete individual user' endpoint, has error catching for e.g. an unauthorised response.
+    // Removes token and redirects user back to login screen if successful
     async function submitDeleteProfile(data) {
       $.ajax({
         type: 'DELETE',
         url: `${endpoints.DIU0}${userID}${endpoints.DIU1}`,
         headers: { 'X-ACCESS-TOKEN': jwt },
         data,
-      }).done(function() {
+        success: function() {
           localStorage.removeItem('token');
           window.location.href = 'login.html';
+        },
+        error: function(jqXHR) {
+          alert('Error: ' + jqXHR.responseJSON.message);
+        }
       });
-    
     }
-  }
 
-  function translateText(text, toLanguage) {
-    const key = "e08b33492e4049bdb2acda2ab3d8f7ad"; // "<your-translator-key>"
-    const location = "uksouth"; // "<YOUR-RESOURCE-LOCATION>"
+    // Handles language selecet 
+    function onLanguageChange() {
+      selectedLanguage = document.getElementById('languageSelect').value;
+      var welcomeText = document.getElementById('welcomeText').textContent;
+      var informationText = document.getElementById('informationText').textContent;
 
-    const params = {
-      'api-version': '3.0',
-      'from': 'en',
-      'to': toLanguage
-    };
+      translateText(welcomeText, selectedLanguage).then(result => {
+          welcomePlaceholder.innerHTML = result + " " + user;
+      });
 
-    const headers = new Headers({
-      'Ocp-Apim-Subscription-Key': key,
-      'Ocp-Apim-Subscription-Region': location,
-      'Content-type': 'application/json',
-      'X-ClientTraceId': Math.random().toString()
-    });
+      translateText(informationText, selectedLanguage).then(result => {
+          informationPlaceholder.innerHTML = result;
+      });
 
-    const body = [{
-      'text': text
-    }];
+      hideMedia();
+    }
+    document.getElementById('languageSelect')?.addEventListener("change", onLanguageChange);
 
-    return fetch(endpoints.TRANSLATOR_ENDPOINT + '?' + new URLSearchParams(params), {
-      method: 'POST',
-      headers: headers,
-      body: JSON.stringify(body)
-    })
-    .then(response => response.json())
-    .then(jsonResponse => {
-      return (jsonResponse)[0]?.translations[0]?.text;
-    })
-    .catch(error => {
-      console.error('Error:', error);
-      throw error;
-    });
+    // Translates to selected language
+    function translateText(text, toLanguage) {
+      const key = "e08b33492e4049bdb2acda2ab3d8f7ad"; // My translator key
+      const location = "uksouth"; // My translator location
+
+      const params = {
+        'api-version': '3.0',
+        'from': 'en',
+        'to': toLanguage
+      };
+
+      const headers = new Headers({
+        'Ocp-Apim-Subscription-Key': key,
+        'Ocp-Apim-Subscription-Region': location,
+        'Content-type': 'application/json',
+        'X-ClientTraceId': Math.random().toString()
+      });
+
+      const body = [{
+        'text': text
+      }];
+
+      return fetch(endpoints.TRANSLATOR_ENDPOINT + '?' + new URLSearchParams(params), {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify(body)
+      })
+      .then(response => response.json())
+      .then(jsonResponse => {
+        return (jsonResponse)[0]?.translations[0]?.text;
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        throw error;
+      });
+    }
   }
 }
   

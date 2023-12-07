@@ -23,13 +23,13 @@
       <div id="maincontent">
         <ul> <!--list of links in navigation bar -->
           <li><a href="index.html">All Posts</a></li>
-          <li><a href="myMedia.html" class="activepage">Your Posts</a></li>
+          <li><a href="myMedia.html" class="activepage">My Posts</a></li>
 
           <li class="profileButtons"><button id="logoutBtn" type="button" class="btn btn-danger">Logout</button></li>
           <li class="profileButtons"><button id="editProfileBtn" type="button" class="btn btn-info">Edit Profile</button></li>
           <li class="profileButtons">
             <!-- Select Language Dropdown -->
-            <select class="form-control" onclick="onLanguageChange()">
+            <select class="form-control">
               <option value="en">English</option>
               <option value="fr">French</option>
               <option value="es">Spanish</option>
@@ -49,7 +49,7 @@
                 <div class="col-2"></div>
             </div>
         </div>
-      <div id="mediaPost"></div>
+      <div id="mediaContainer"></div>
     
       <!-- Modal -->
       <div class="modal fade" id="updateMediaModal" tabindex="-1" role="dialog" aria-labelledby="updateMediaLabel" aria-hidden="true">
